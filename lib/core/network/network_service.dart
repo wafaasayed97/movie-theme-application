@@ -35,7 +35,7 @@ class NetworkService {
   void addHeaders() async {
     final token = await sl<SecureStorage>().read(SecureStorageKeys.userToken);
     dio.options.headers = {
-      "Authorization": "Bearer $token",
+      "Authorization": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI5ZDU0MmMyMGI4M2Y1ZDNhNDc2NTYzZGU2MjE1ZTE0NiIsIm5iZiI6MTY5Nzc0MzM5MS43MjYsInN1YiI6IjY1MzE4MjFmYjI2ODFmMDBhYzQ4MDM0MiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.7aW5e23q4eVuKueX-WMLyzxvkxpbWfTPPgWVtEFhWZU",
       "Content-Type": "application/json",
       "locale": sl<PreferencesStorage>().getCurrentLanguage(),
     };

@@ -1,5 +1,5 @@
 class AppStrings {
   static const String baseUrl =
-  'https://accessories-eshop.runasp.net/api/';
+  'https://api.themoviedb.org/3/';
   static const String perPage = '10';
 }
