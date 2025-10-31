@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
-import 'package:movie_theming_app/core/helpers/user_helpers.dart';
-import 'package:movie_theming_app/core/routes/route_paths.dart';
+// import 'package:go_router/go_router.dart';
+// import 'package:movie_theming_app/core/helpers/user_helpers.dart';
+// import 'package:movie_theming_app/core/routes/route_paths.dart';
 
 
 class AuthNavigationService {
@@ -11,11 +11,11 @@ class AuthNavigationService {
 
   Future<void> navigate() async {
 
-    if (UserHelpers.isFirstTime()) {
-      context.pushReplacement(Routes.onboardingScreen);
-    } else {
-      context.pushReplacement(Routes.loginScreen);
-    }
+    // if (UserHelpers.isFirstTime()) {
+    //   context.pushReplacement(Routes.onboardingScreen);
+    // } else {
+    //   context.pushReplacement(Routes.loginScreen);
+    // }
 
     // final localAuthEnabled = await sl<SecureStorage>().read(
     //   SecureStorageKeys.localAuthEnabled,

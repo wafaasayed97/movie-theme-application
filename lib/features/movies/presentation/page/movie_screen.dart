@@ -1,7 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:movie_theming_app/core/app_cubit/app_cubit.dart';
 import 'package:movie_theming_app/core/extensions/ext.dart';
 import 'package:movie_theming_app/core/routes/route_paths.dart';
+import 'package:movie_theming_app/core/theme/styles.dart';
+import 'package:movie_theming_app/features/movie_details/presentation/page/movie_details_screen.dart';
+import 'package:movie_theming_app/features/movies/presentation/widgets/movie_card_widget.dart';
 
 class MoviesListScreen extends StatefulWidget {
   const MoviesListScreen({super.key});
@@ -12,31 +18,11 @@ class MoviesListScreen extends StatefulWidget {
 
 class _MoviesListScreenState extends State<MoviesListScreen> {
   final List<MovieModel> _movies = [
-    MovieModel(
-      title: 'The Matrix',
-      rating: 8.7,
-      genre: 'Sci-Fi',
-    ),
-    MovieModel(
-      title: 'Fight Club',
-      rating: 8.8,
-      genre: 'Drama',
-    ),
-    MovieModel(
-      title: 'Forrest Gump',
-      rating: 8.8,
-      genre: 'Drama',
-    ),
-    MovieModel(
-      title: 'The Shawshank Redemption',
-      rating: 9.3,
-      genre: 'Drama',
-    ),
-    MovieModel(
-      title: 'The Godfather',
-      rating: 9.2,
-      genre: 'Crime',
-    ),
+    MovieModel(title: 'The Matrix', rating: 8.7, genre: 'Sci-Fi'),
+    MovieModel(title: 'Fight Club', rating: 8.8, genre: 'Drama'),
+    MovieModel(title: 'Forrest Gump', rating: 8.8, genre: 'Drama'),
+    MovieModel(title: 'The Shawshank Redemption', rating: 9.3, genre: 'Drama'),
+    MovieModel(title: 'The Godfather', rating: 9.2, genre: 'Crime'),
   ];
 
   @override
@@ -48,17 +34,12 @@ class _MoviesListScreenState extends State<MoviesListScreen> {
         title: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              Icons.movie,
-              color: Theme.of(context).colorScheme.onPrimary,
-            ),
+            Icon(Icons.movie, color: Theme.of(context).colorScheme.onPrimary),
             8.wSpace,
             Text(
               'Movies',
-              style: TextStyle(
+              style: font20w600.copyWith(
                 color: Theme.of(context).colorScheme.onPrimary,
-                fontSize: 20,
-                fontWeight: FontWeight.w600,
               ),
             ),
           ],
@@ -67,40 +48,44 @@ class _MoviesListScreenState extends State<MoviesListScreen> {
         actions: [
           IconButton(
             icon: Icon(
-              Icons.brightness_6,
+              Theme.of(context).brightness == Brightness.dark
+                  ? Icons.light_mode
+                  : Icons.dark_mode,
               color: Theme.of(context).colorScheme.onPrimary,
             ),
-            onPressed: () {},
+            onPressed: () {
+              context.read<AppCubit>().toggleTheme();
+            },
           ),
         ],
       ),
       body: ListView.builder(
-        padding: EdgeInsets.all(16),
+        padding: EdgeInsets.all(16.h),
         itemCount: _movies.length + 1,
         itemBuilder: (context, index) {
           if (index == _movies.length) {
             return Padding(
-              padding: EdgeInsets.only(top: 16),
+              padding: EdgeInsets.only(top: 16.h),
               child: Center(
                 child: TextButton(
                   onPressed: () {},
                   style: TextButton.styleFrom(
-                    backgroundColor: Theme.of(context).colorScheme.surface,
-                    padding: EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                    backgroundColor: Theme.of(
+                      context,
+                    ).colorScheme.surfaceContainerHighest,
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 32.w,
+                      vertical: 16.h,
+                    ),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      side: BorderSide(
-                        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.2),
-                        width: 1,
-                      ),
+                      borderRadius: BorderRadius.circular(12.r),
+                      side: BorderSide(color: Theme.of(context).dividerColor),
                     ),
                   ),
                   child: Text(
                     'Load More Movies',
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.onSurface,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
+                    style: font16w500.copyWith(
+                      color: Theme.of(context).hintColor,
                     ),
                   ),
                 ),
@@ -118,125 +103,4 @@ class _MoviesListScreenState extends State<MoviesListScreen> {
       ),
     );
   }
-}
-
-class MovieCard extends StatelessWidget {
-  final MovieModel movie;
-  final VoidCallback onTap;
-
-  const MovieCard({
-    super.key,
-    required this.movie,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        margin: EdgeInsets.only(bottom: 16),
-        padding: EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.surface,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.2),
-            width: 1,
-          ),
-        ),
-        child: Row(
-          children: [
-            Container(
-              width: 100,
-              height: 140,
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Icon(
-                Icons.hide_image_outlined,
-                size: 40,
-                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3),
-              ),
-            ),
-            16.wSpace,
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    movie.title,
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.onSurface,
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  12.hSpace,
-                  Row(
-                    children: [
-                      Icon(
-                        Icons.star,
-                        color: Colors.amber,
-                        size: 20,
-                      ),
-                      6.wSpace,
-                      Text(
-                        '${movie.rating}/10',
-                        style: TextStyle(
-                          color: Theme.of(context).colorScheme.onSurface,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
-                  ),
-                  12.hSpace,
-                  Container(
-                    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.surface,
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(
-                        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3),
-                        width: 1,
-                      ),
-                    ),
-                    child: Text(
-                      movie.genre,
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.onSurface,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Icon(
-              Icons.chevron_right,
-              color: Theme.of(context).colorScheme.onSurface,
-              size: 28,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class MovieModel {
-  final String title;
-  final double rating;
-  final String genre;
-  final String? description;
-
-  MovieModel({
-    required this.title,
-    required this.rating,
-    required this.genre,
-    this.description,
-  });
 }

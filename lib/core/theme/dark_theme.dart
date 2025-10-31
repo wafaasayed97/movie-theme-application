@@ -3,19 +3,15 @@ import '/core/theme/dark_colors.dart';
 
 final ColorScheme darkColorScheme = ColorScheme(
   primary: AppDarkColors.primary,
-
-  // primaryVariant: Colors.blueAccent,
   secondary: Colors.green,
-  // secondaryVariant: Colors.greenAccent,
-  surface: Colors.black,
+  surface: Color(0xFF121212),
   onSurface: Colors.white,
-  surfaceContainerHighest: Colors.white,
+  surfaceContainerHighest: Color(0xFF1E1E1E),
   error: Color(0xFFEC221F),
   onPrimary: Colors.white,
   onSecondary: Colors.black,
   onError: Colors.white,
   brightness: Brightness.dark,
-  // More colors
 );
 
 final darkTheme = ThemeData(
@@ -23,9 +19,11 @@ final darkTheme = ThemeData(
   visualDensity: VisualDensity.adaptivePlatformDensity,
   colorScheme: darkColorScheme,
   useMaterial3: true,
-  hintColor: Colors.black,
+  hintColor: AppDarkColors.hint,
   inputDecorationTheme: InputDecorationTheme(
-    hintStyle: TextStyle(color: Colors.white),
-    fillColor: Colors.black,
+    hintStyle: TextStyle(color: AppDarkColors.hint),
+    fillColor: AppDarkColors.formfiledFillColor,
   ),
+  cardColor: Color(0xFF1E1E1E),
+  dividerColor: Color(0xFF4A4A4A),
 );
