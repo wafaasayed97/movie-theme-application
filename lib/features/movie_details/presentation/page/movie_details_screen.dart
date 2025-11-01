@@ -17,20 +17,12 @@ class MovieDetailsScreen extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.surface,
         leading: IconButton(
-          icon: Icon(
-            Icons.arrow_back,
-            color: Theme.of(context).colorScheme.primary,
-          ),
+          icon: Icon(Icons.arrow_back),
           onPressed: () {
             context.pop();
           },
         ),
-        title: Text(
-          'Movie Details',
-          style: font20w600.copyWith(
-            color: Theme.of(context).colorScheme.primary,
-          ),
-        ),
+        title: Text('Movie Details', style: font20w600),
         centerTitle: true,
         elevation: 0,
       ),
@@ -89,9 +81,14 @@ class MovieDetailsScreen extends StatelessWidget {
                 ),
                 16.wSpace,
                 Container(
-                  padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 8.h),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 20.w,
+                    vertical: 8.h,
+                  ),
                   decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.surfaceContainerHighest,
                     borderRadius: BorderRadius.circular(8.r),
                     border: Border.all(
                       color: Theme.of(context).dividerColor,
@@ -116,8 +113,7 @@ class MovieDetailsScreen extends StatelessWidget {
             ),
             12.hSpace,
             Text(
-              movie.overview ??
-                  'No description available for this movie.',
+              movie.overview ?? 'No description available for this movie.',
               style: font16w400.copyWith(
                 color: Theme.of(context).hintColor,
                 height: 1.5,
@@ -176,9 +172,7 @@ class MovieDetailsScreen extends StatelessWidget {
         Expanded(
           child: Text(
             value,
-            style: font14w400.copyWith(
-              color: Theme.of(context).hintColor,
-            ),
+            style: font14w400.copyWith(color: Theme.of(context).hintColor),
           ),
         ),
       ],

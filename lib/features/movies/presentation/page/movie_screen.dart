@@ -51,30 +51,30 @@ class _MoviesListScreenState extends State<MoviesListScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.primary,
         title: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.movie, color: Theme.of(context).colorScheme.onPrimary),
-            8.wSpace,
-            Text(
-              'Movies',
-              style: font20w600.copyWith(
-                color: Theme.of(context).colorScheme.onPrimary,
-              ),
+            Icon(
+              Icons.movie,
+              color: Theme.of(context).colorScheme.brightness == Brightness.dark
+                  ? Colors.amber
+                  : Colors.blue.shade700,
             ),
+            8.wSpace,
+            Text('Movies', style: font20w600),
           ],
         ),
         centerTitle: true,
         actions: [
           IconButton(
             icon: Icon(
-              Theme.of(context).brightness == Brightness.dark
+              Theme.of(context).colorScheme.brightness == Brightness.dark
                   ? Icons.light_mode
                   : Icons.dark_mode,
-              color: Theme.of(context).colorScheme.onPrimary,
+              color: Theme.of(context).colorScheme.brightness == Brightness.dark
+                  ? Colors.amber
+                  : Colors.blue.shade700,
             ),
             onPressed: () {
               context.read<AppCubit>().toggleTheme();
