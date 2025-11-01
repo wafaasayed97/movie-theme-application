@@ -6,7 +6,8 @@ import 'package:movie_theming_app/core/app_cubit/app_cubit.dart';
 import 'package:movie_theming_app/core/extensions/ext.dart';
 import 'package:movie_theming_app/core/routes/route_paths.dart';
 import 'package:movie_theming_app/core/theme/styles.dart';
-import 'package:movie_theming_app/features/movie_details/presentation/page/movie_details_screen.dart';
+import 'package:movie_theming_app/features/movies/presentation/cubit/movies_cubit.dart';
+import 'package:movie_theming_app/features/movies/presentation/cubit/movies_state.dart';
 import 'package:movie_theming_app/features/movies/presentation/widgets/movie_card_widget.dart';
 
 class MoviesListScreen extends StatefulWidget {
@@ -17,13 +18,27 @@ class MoviesListScreen extends StatefulWidget {
 }
 
 class _MoviesListScreenState extends State<MoviesListScreen> {
-  final List<MovieModel> _movies = [
-    MovieModel(title: 'The Matrix', rating: 8.7, genre: 'Sci-Fi'),
-    MovieModel(title: 'Fight Club', rating: 8.8, genre: 'Drama'),
-    MovieModel(title: 'Forrest Gump', rating: 8.8, genre: 'Drama'),
-    MovieModel(title: 'The Shawshank Redemption', rating: 9.3, genre: 'Drama'),
-    MovieModel(title: 'The Godfather', rating: 9.2, genre: 'Crime'),
-  ];
+  final ScrollController _scrollController = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+    context.read<MoviesCubit>().getMovies();
+    _scrollController.addListener(_onScroll);
+  }
+
+  void _onScroll() {
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent * 0.9) {
+      context.read<MoviesCubit>().getMovies(loadMore: true);
+    }
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -59,46 +74,99 @@ class _MoviesListScreenState extends State<MoviesListScreen> {
           ),
         ],
       ),
-      body: ListView.builder(
-        padding: EdgeInsets.all(16.h),
-        itemCount: _movies.length + 1,
-        itemBuilder: (context, index) {
-          if (index == _movies.length) {
-            return Padding(
-              padding: EdgeInsets.only(top: 16.h),
-              child: Center(
-                child: TextButton(
-                  onPressed: () {},
-                  style: TextButton.styleFrom(
-                    backgroundColor: Theme.of(
-                      context,
-                    ).colorScheme.surfaceContainerHighest,
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 32.w,
-                      vertical: 16.h,
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12.r),
-                      side: BorderSide(color: Theme.of(context).dividerColor),
-                    ),
-                  ),
-                  child: Text(
-                    'Load More Movies',
-                    style: font16w500.copyWith(
-                      color: Theme.of(context).hintColor,
-                    ),
-                  ),
-                ),
+      body: BlocBuilder<MoviesCubit, MoviesState>(
+        builder: (context, state) {
+          if (state is MoviesLoading) {
+            return Center(
+              child: CircularProgressIndicator(
+                color: Theme.of(context).colorScheme.primary,
               ),
             );
           }
 
-          return MovieCard(
-            movie: _movies[index],
-            onTap: () {
-              context.push(Routes.movieDetails, extra: _movies[index]);
-            },
-          );
+          if (state is MoviesFailure) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.error_outline,
+                    size: 60.h,
+                    color: Theme.of(context).colorScheme.error,
+                  ),
+                  16.hSpace,
+                  Text(
+                    state.message,
+                    style: font16w500.copyWith(
+                      color: Theme.of(context).colorScheme.onSurface,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  16.hSpace,
+                  ElevatedButton(
+                    onPressed: () {
+                      context.read<MoviesCubit>().getMovies();
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Theme.of(context).colorScheme.primary,
+                    ),
+                    child: Text(
+                      'Retry',
+                      style: font16w500.copyWith(
+                        color: Theme.of(context).colorScheme.onPrimary,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }
+
+          if (state is MoviesSuccess || state is MoviesPaginationLoading) {
+            final movies = state is MoviesSuccess
+                ? state.movies
+                : (state as MoviesPaginationLoading).movies;
+            final hasMore = state is MoviesSuccess ? state.hasMore : true;
+
+            if (movies.isEmpty) {
+              return Center(
+                child: Text(
+                  'No movies found',
+                  style: font16w500.copyWith(
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
+                ),
+              );
+            }
+
+            return ListView.builder(
+              controller: _scrollController,
+              padding: EdgeInsets.all(16.h),
+              itemCount: movies.length + (hasMore ? 1 : 0),
+              itemBuilder: (context, index) {
+                if (index == movies.length) {
+                  return Padding(
+                    padding: EdgeInsets.symmetric(vertical: 16.h),
+                    child: Center(
+                      child: CircularProgressIndicator(
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
+                    ),
+                  );
+                }
+
+                final movie = movies[index];
+                return MovieCard(
+                  movie: movie,
+                  onTap: () {
+                    context.push(Routes.movieDetails, extra: movie);
+                  },
+                );
+              },
+            );
+          }
+
+          return SizedBox.shrink();
         },
       ),
     );

@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:movie_theming_app/core/extensions/ext.dart';
 import 'package:movie_theming_app/core/theme/styles.dart';
-import 'package:movie_theming_app/features/movie_details/presentation/page/movie_details_screen.dart';
+import 'package:movie_theming_app/features/movies/data/models/movies_model.dart';
 
 class MovieCard extends StatelessWidget {
-  final MovieModel movie;
+  final Result movie;
   final VoidCallback onTap;
 
   const MovieCard({super.key, required this.movie, required this.onTap});
@@ -26,29 +26,52 @@ class MovieCard extends StatelessWidget {
           children: [
             Container(
               width: 100.w,
-              height: 100.h,
+              height: 140.h,
               decoration: BoxDecoration(
                 color: Theme.of(context).cardColor.withOpacity(0.5),
                 borderRadius: BorderRadius.circular(8.r),
               ),
-              child: Icon(
-                Icons.hide_image_outlined,
-                size: 40.h,
-                color: Theme.of(context).dividerColor,
-              ),
+              child: movie.posterPath != null
+                  ? ClipRRect(
+                      borderRadius: BorderRadius.circular(8.r),
+                      child: Image.network(
+                        'https://image.tmdb.org/t/p/w500${movie.posterPath}',
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Icon(
+                            Icons.hide_image_outlined,
+                            size: 40.h,
+                            color: Theme.of(context).dividerColor,
+                          );
+                        },
+                      ),
+                    )
+                  : Icon(
+                      Icons.hide_image_outlined,
+                      size: 40.h,
+                      color: Theme.of(context).dividerColor,
+                    ),
             ),
             16.wSpace,
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(movie.title, style: font16w600),
+                  Text(
+                    movie.title ?? 'Unknown Title',
+                    style: font16w600,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
                   12.hSpace,
                   Row(
                     children: [
                       Icon(Icons.star, color: Colors.amber, size: 20.h),
                       6.wSpace,
-                      Text('${movie.rating}/10', style: font16w400),
+                      Text(
+                        '${movie.voteAverage?.toStringAsFixed(1) ?? '0.0'}/10',
+                        style: font16w400,
+                      ),
                     ],
                   ),
                   12.hSpace,
@@ -65,7 +88,7 @@ class MovieCard extends StatelessWidget {
                       ),
                     ),
                     child: Text(
-                      movie.genre,
+                      movie.releaseDate ?? 'Unknown',
                       style: font14w400.copyWith(
                         color: Theme.of(context).hintColor,
                       ),
