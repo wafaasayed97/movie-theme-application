@@ -12,4 +12,8 @@ class MoviesRepo {
     final result = await api.getMovies(page);
     return result.fold((l) => Left(l), (r) => Right(r));
   }
+
+  Future<void> clearCache() async {
+    await api.clearCache();
+  }
 }

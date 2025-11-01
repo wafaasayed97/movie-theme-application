@@ -19,12 +19,20 @@ class MoviesListScreen extends StatefulWidget {
 
 class _MoviesListScreenState extends State<MoviesListScreen> {
   final ScrollController _scrollController = ScrollController();
+  bool _isRefreshing = false;
 
   @override
   void initState() {
     super.initState();
     context.read<MoviesCubit>().getMovies();
     _scrollController.addListener(_onScroll);
+  }
+
+  Future<void> _onRefresh() async {
+    if (_isRefreshing) return;
+    setState(() => _isRefreshing = true);
+    await context.read<MoviesCubit>().refreshMovies();
+    setState(() => _isRefreshing = false);
   }
 
   void _onScroll() {
@@ -139,30 +147,34 @@ class _MoviesListScreenState extends State<MoviesListScreen> {
               );
             }
 
-            return ListView.builder(
-              controller: _scrollController,
-              padding: EdgeInsets.all(16.h),
-              itemCount: movies.length + (hasMore ? 1 : 0),
-              itemBuilder: (context, index) {
-                if (index == movies.length) {
-                  return Padding(
-                    padding: EdgeInsets.symmetric(vertical: 16.h),
-                    child: Center(
-                      child: CircularProgressIndicator(
-                        color: Theme.of(context).colorScheme.primary,
+            return RefreshIndicator(
+              onRefresh: _onRefresh,
+              color: Theme.of(context).colorScheme.primary,
+              child: ListView.builder(
+                controller: _scrollController,
+                padding: EdgeInsets.all(16.h),
+                itemCount: movies.length + (hasMore ? 1 : 0),
+                itemBuilder: (context, index) {
+                  if (index == movies.length) {
+                    return Padding(
+                      padding: EdgeInsets.symmetric(vertical: 16.h),
+                      child: Center(
+                        child: CircularProgressIndicator(
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
                       ),
-                    ),
-                  );
-                }
+                    );
+                  }
 
-                final movie = movies[index];
-                return MovieCard(
-                  movie: movie,
-                  onTap: () {
-                    context.push(Routes.movieDetails, extra: movie);
-                  },
-                );
-              },
+                  final movie = movies[index];
+                  return MovieCard(
+                    movie: movie,
+                    onTap: () {
+                      context.push(Routes.movieDetails, extra: movie);
+                    },
+                  );
+                },
+              ),
             );
           }
 

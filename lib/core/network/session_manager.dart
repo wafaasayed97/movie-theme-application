@@ -1,4 +1,3 @@
-import 'package:movie_theming_app/core/cache/hive/hive_keys.dart';
 import 'package:movie_theming_app/core/cache/preferences_storage/preferences_storage.dart';
 import 'package:movie_theming_app/core/helpers/alerts.dart';
 import '../../generated/l10n.dart';
@@ -15,10 +14,7 @@ class SessionManager {
     await storage.deleteAll();
     await Future.wait([
       hiveHelper.clear(),
-      hiveHelper.delete(HiveKeys.units),
-      hiveHelper.delete(HiveKeys.profile),
-      hiveHelper.delete(HiveKeys.news),
-      hiveHelper.delete(HiveKeys.rmUser),
+   
     ]);
     showError(S().your_session_has_been_expired);
     // TODO: Navigate to LOGIN SCREEN

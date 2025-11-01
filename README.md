@@ -9,6 +9,15 @@ A Flutter mobile application that displays popular movies from The Movie Databas
 - Infinite scroll pagination (loads more movies automatically)
 - Movie posters with title, rating, and release date
 - Clean card-based UI design
+- Pull-to-refresh functionality
+
+### 💾 Smart Caching System
+- **24-hour cache validity** - Movies cached for offline access
+- **Instant loading** - Cached data loads immediately
+- **Offline mode** - Browse movies without internet connection
+- **Smart refresh** - Auto-updates after cache expires
+- **Manual refresh** - Pull down to force refresh and clear cache
+- **Hive database** - Fast and efficient local storage
 
 ### 🎭 Movie Details
 - Detailed movie information page
@@ -43,6 +52,7 @@ A Flutter mobile application that displays popular movies from The Movie Databas
 - Internet connectivity check
 - Loading states
 - Retry functionality on failure
+- Offline support with cached data
 
 ## 🏗️ Architecture
 
@@ -52,6 +62,9 @@ lib/
 ├── core/
 │   ├── app_cubit/          # Global app state (theme)
 │   ├── cache/              # Local storage
+│   │   ├── hive/           # Hive caching (movies)
+│   │   ├── preferences/    # Shared preferences
+│   │   └── secure/         # Secure storage
 │   ├── constants/          # App constants
 │   ├── di/                 # Dependency injection
 │   ├── error/              # Error handling
@@ -62,7 +75,7 @@ lib/
 ├── features/
 │   ├── movies/
 │   │   ├── data/
-│   │   │   ├── data_source/    # API calls
+│   │   │   ├── data_source/    # API calls + caching
 │   │   │   ├── models/         # Data models
 │   │   │   └── repo/           # Repository
 │   │   └── presentation/
@@ -85,63 +98,12 @@ lib/
 - **Dartz** - Functional programming (Either type)
 - **flutter_screenutil** - Responsive design
 - **shared_preferences** - Local storage
+- **flutter_secure_storage** - Secure storage
+- **Hive** - Fast NoSQL database for caching
+- **get_it** - Dependency injection
 - **TMDB API** - Movie data source
 
-## 📦 Key Packages
 
-```yaml
-dependencies:
-  flutter_bloc: ^8.x.x
-  dio: ^5.x.x
-  dartz: ^0.10.x
-  go_router: ^13.x.x
-  flutter_screenutil: ^5.x.x
-  shared_preferences: ^2.x.x
-  connectivity_plus: ^5.x.x
-```
-
-## 🚀 Getting Started
-
-### Prerequisites
-- Flutter SDK (3.0.0 or higher)
-- Dart SDK (3.0.0 or higher)
-- TMDB API Key
-
-### Installation
-
-1. Clone the repository
-```bash
-git clone https://github.com/yourusername/movie_theming_app.git
-cd movie_theming_app
-```
-
-2. Install dependencies
-```bash
-flutter pub get
-```
-
-3. Add your TMDB API key
-Open `lib/features/movies/data/data_source/movies_data_source.dart` and add your API key:
-```dart
-queryParameters: {
-  'api_key': 'YOUR_API_KEY_HERE',
-  'page': page,
-  'language': 'en-US',
-}
-```
-
-4. Run the app
-```bash
-flutter run
-```
-
-## 🔑 Getting TMDB API Key
-
-1. Go to [The Movie Database](https://www.themoviedb.org/)
-2. Create an account or sign in
-3. Go to Settings → API
-4. Request an API key
-5. Copy your API key and add it to the project
 
 ## 📱 Screens
 
@@ -149,6 +111,8 @@ flutter run
 - Displays popular movies in a scrollable list
 - Auto-loads more movies on scroll
 - Theme toggle button in app bar
+- **Pull down to refresh and clear cache**
+- Instant loading from cache (offline mode)
 
 ### Movie Details Screen
 - Full movie information
@@ -179,6 +143,18 @@ flutter run
 - `MoviesSuccess` - Data loaded successfully
 - `MoviesFailure` - Error occurred
 
+### Caching Flow
+1. **First Load**: API → Cache → Display
+2. **Cached Load**: Cache → Display (instant)
+3. **Expired Cache**: API → Update Cache → Display
+4. **Pull to Refresh**: Clear Cache → API → New Cache → Display
+
+### Cache Configuration
+- **Storage**: Hive NoSQL database
+- **Duration**: 24 hours
+- **Strategy**: Cache-first for page 1, Network-first for other pages
+- **Size**: Optimized JSON storage
+
 ### AppCubit
 - Manages global app state
 - Theme switching
@@ -192,31 +168,23 @@ flutter run
 - Retry functionality
 - Loading indicators
 - Empty state handling
+- Cache fallback on network errors
+- Offline mode with cached data
 
 ## 📈 Future Enhancements
 
 - [ ] Search functionality
 - [ ] Movie filters (genre, year, rating)
-- [ ] Favorites list
+- [ ] Favorites list with local storage
 - [ ] Movie trailers
 - [ ] User reviews
-- [ ] Offline mode
+- [ ] Enhanced offline mode
 - [ ] Share movies
 - [ ] Multiple languages support
+- [ ] Cache management settings
+- [ ] Download movies for offline viewing
 
-## 👨‍💻 Developer
 
-Your Name - [@yourhandle](https://twitter.com/yourhandle)
-
-## 📄 License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## 🙏 Acknowledgments
-
-- [The Movie Database (TMDB)](https://www.themoviedb.org/) for the API
-- Flutter community for amazing packages
-- Clean Architecture principles
 
 ---
 

@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get_it/get_it.dart';
 import 'package:movie_theming_app/core/cache/hive/hive_helper.dart';
+import 'package:movie_theming_app/core/cache/hive/movie_cache_helper.dart';
 import 'package:movie_theming_app/core/network/network_service.dart';
 import 'package:movie_theming_app/core/network/session_manager.dart';
 import 'package:movie_theming_app/features/movies/data/data_source/movies_data_source.dart';
@@ -24,10 +25,9 @@ class ServicesLocator {
 
     _initSessionManager();
 
-    _initHiveHelper();
+    await _initHiveHelper(); // ✅ await this before _initMovies
 
     _initMovies();
-
   }
 
   Future<void> _initSharedPreferencesStorage() async {
@@ -48,16 +48,22 @@ class ServicesLocator {
     sl.registerLazySingleton(() => NetworkService(Dio()));
   }
 
-  void _initHiveHelper() async {
+  Future<void> _initHiveHelper() async {
     final hiveHelper = HiveHelper();
     await hiveHelper.init();
+
     sl.registerLazySingleton(() => hiveHelper);
+
+    sl.registerLazySingleton<MoviesCacheHelper>(
+      () => MoviesCacheHelper(sl<HiveHelper>()),
+    );
   }
 
   void _initMovies() {
-    sl.registerLazySingleton(() => MoviesDataSource(sl()));
+    sl.registerLazySingleton(
+      () => MoviesDataSource(networkService: sl(), cacheHelper: sl()),
+    );
     sl.registerLazySingleton(() => MoviesRepo(api: sl()));
     sl.registerFactory(() => MoviesCubit(sl()));
   }
-
 }

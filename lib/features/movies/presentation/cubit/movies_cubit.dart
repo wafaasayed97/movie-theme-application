@@ -51,6 +51,15 @@ class MoviesCubit extends Cubit<MoviesState> {
     );
   }
 
+  Future<void> refreshMovies() async {
+    await moviesRepo.clearCache();
+    _currentPage = 1;
+    _hasMore = true;
+    _isLoading = false;
+    _movies.clear();
+    await getMovies();
+  }
+
   void resetMovies() {
     _currentPage = 1;
     _hasMore = true;
