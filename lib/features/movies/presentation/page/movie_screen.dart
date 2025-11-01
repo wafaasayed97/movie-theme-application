@@ -118,12 +118,7 @@ class _MoviesListScreenState extends State<MoviesListScreen> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Theme.of(context).colorScheme.primary,
                     ),
-                    child: Text(
-                      'Retry',
-                      style: font16w500.copyWith(
-                        color: Theme.of(context).colorScheme.onPrimary,
-                      ),
-                    ),
+                    child: Text('Retry', style: font16w500),
                   ),
                 ],
               ),
