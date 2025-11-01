@@ -3,14 +3,11 @@ import 'dart:io';
 
 import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
-import 'package:movie_theming_app/core/cache/preferences_storage/preferences_storage.dart';
 import 'package:movie_theming_app/core/error/failure.dart';
 import 'package:movie_theming_app/core/network/authorization_interceptor.dart';
 
 import '/core/constants/strings.dart';
-import '/core/di/services_locator.dart';
 import '../../generated/l10n.dart';
-import '../cache/secure_storage/secure_storage.dart';
 
 class NetworkService {
   final Dio dio;
@@ -32,12 +29,12 @@ class NetworkService {
     dio.interceptors.add(AuthorizationInterceptor());
   }
 
-  void addHeaders() async {
-    final token = await sl<SecureStorage>().read(SecureStorageKeys.userToken);
+  void addHeaders() {
     dio.options.headers = {
-      "Authorization": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI5ZDU0MmMyMGI4M2Y1ZDNhNDc2NTYzZGU2MjE1ZTE0NiIsIm5iZiI6MTY5Nzc0MzM5MS43MjYsInN1YiI6IjY1MzE4MjFmYjI2ODFmMDBhYzQ4MDM0MiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.7aW5e23q4eVuKueX-WMLyzxvkxpbWfTPPgWVtEFhWZU",
+      "Authorization":
+          "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI5ZDU0MmMyMGI4M2Y1ZDNhNDc2NTYzZGU2MjE1ZTE0NiIsIm5iZiI6MTY5Nzc0MzM5MS43MjYsInN1YiI6IjY1MzE4MjFmYjI2ODFmMDBhYzQ4MDM0MiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.7aW5e23q4eVuKueX-WMLyzxvkxpbWfTPPgWVtEFhWZU",
       "Content-Type": "application/json",
-      "locale": sl<PreferencesStorage>().getCurrentLanguage(),
+      "accept": "application/json",
     };
   }
 
@@ -56,6 +53,7 @@ class NetworkService {
           data['msg'] ??
           data['error'] ??
           data['errorMessage'] ??
+          data['status_message'] ??
           S().somethingWentWrong;
     }
     return S().somethingWentWrong;
@@ -70,32 +68,24 @@ class NetworkService {
     try {
       final response = await requestFn();
 
-      // Parse response data if it's a string
       dynamic responseData = response.data;
       if (responseData is String && responseData.isNotEmpty) {
         try {
           responseData = jsonDecode(responseData);
-        } catch (e) {
-          // If can't parse, keep as string
-        }
+        } catch (e) {}
       }
 
-      // Success response (200-299)
       if (response.statusCode! >= 200 && response.statusCode! <= 299) {
-        // Check if response explicitly has status: false
         if (responseData is Map && responseData['status'] == false) {
           final message = extractMessage(responseData);
           return Left(Failure(message, data: responseData['data']));
         }
         return Right(responseData);
-      }
-      // Error response (400+)
-      else {
+      } else {
         final message = extractMessage(responseData);
         return Left(Failure(message, data: responseData));
       }
     } on DioException catch (e) {
-      // Handle Dio errors
       dynamic errorData = e.response?.data;
       if (errorData is String && errorData.isNotEmpty) {
         try {
